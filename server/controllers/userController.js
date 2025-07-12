@@ -37,6 +37,7 @@ const registerUser = asyncHandler(async(req, res) => {
     const checkUser = await prisma.user.findUnique({
         where: {
             username,
+            
         }
     });
     if (checkUser) {
