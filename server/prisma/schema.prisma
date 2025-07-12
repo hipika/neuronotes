@@ -19,12 +19,3 @@ model User {
   email String @unique
   password String
 }
-
-
-model Notes {
-  id Int @id @default(autoincrement())
-  title String
-  raw_input String
-  ai_summary String
-  graph_json JSONB
-}
