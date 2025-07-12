@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
-import  { BrowserRouter, Route, Routes, Link } from "react-router";
+import  { BrowserRouter, Route, Routes, Link, useNavigate } from "react-router";
 import Form from '../components/Form';
 import Navbar from '../components/Navbar';
 import Animation from '../components/Animation';
 const Register = () => {
   const [joinData, setJoinData] = useState({ username: "", email: "", password: "" })
+  const [authed, setAuthed] = useState();
+  const navigate = useNavigate();
   // handling change ...-> apply this function to all values
   const handleChange = (e) => {
     setJoinData({ ...joinData, [e.target.name]: e.target.value})
@@ -13,14 +15,23 @@ const Register = () => {
   // handling submit
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const response = await fetch("http://localhost:5000/api/users/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json"},
-      body: JSON.stringify(joinData) // turns updated joinData into json format
-    })
+    
+    try {
+      const response = await fetch("http://localhost:5000/api/users/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json"},
+        body: JSON.stringify(joinData) // turns updated joinData into json format
+      })
+      setAuthed(true);
+      navigate("/upload");
+      const data = await response.json()
+      console.log(data);
+    
+    } catch (e) {
+      console.log(e);
+    }
 
-    const data = await response.json()
-    console.log(data);
+
   }
 
 

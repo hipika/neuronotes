@@ -3,9 +3,12 @@ import Form from '../components/Form'
 import Navbar from '../components/Navbar'
 import Animation from '../components/Animation'
 import axios from "axios"
+import { useNavigate } from 'react-router'
 const Login = () => {
 
   const [joinData, setJoinData] = useState({ username: "", password: "" })
+  const [authed, setAuthed] = useState();
+  const navigate = useNavigate();
     // handling change ...-> apply this function to all values
     const handleChange = (e) => {
       setJoinData({ ...joinData, [e.target.name]: e.target.value})
@@ -14,14 +17,25 @@ const Login = () => {
     // handling submit
     const handleSubmit = async (e) => {
       e.preventDefault()
-      const response = await fetch("http://localhost:5000/api/users/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json"},
-        body: JSON.stringify(joinData) // turns updated joinData into json format
-      })
-  
-      const data = await response.json()
-      console.log(data);
+      
+      try {
+        
+        const response = await fetch("http://localhost:5000/api/users/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json"},
+          body: JSON.stringify(joinData) // turns updated joinData into json format  
+        })
+
+        setAuthed(true);
+        navigate("/upload")
+
+        const data = await response.json()
+        console.log(data);
+
+      
+      } catch (e) {
+        console.log(e)
+      }
     }
   
 
