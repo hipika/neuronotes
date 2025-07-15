@@ -88,12 +88,16 @@ const loginUser = asyncHandler(async (req, res) => {
         }, process.env.JWT_SECRET)
 
         res.send({
+            success: true,
             token: accessToken
         });
 
         console.log("user logged in")
     }
-    else{ 
+    else{
+        res.send({
+            success: false
+        });
         throw new Error("Wrong password/username")
     }
     
