@@ -3,6 +3,12 @@ import Uploader from '../components/Uploader'
 import { Link } from 'react-router'
 
 const Upload = () => {
+
+  const handleClick = () => {
+    localStorage.removeItem("jwt");
+    console.log("user logged out") 
+  }
+
   return (
     <div>
 
@@ -10,7 +16,7 @@ const Upload = () => {
         <button className="text-black hover:bg-gray-200 px-2 py-1 rounded-md cursor-pointer">Saved</button>
 
         <Link to="/">
-            <button className="text-black hover:bg-gray-200 px-2 py-1 rounded-md cursor-pointer">Logout</button>
+            <button onClick={handleClick} className="text-black hover:bg-gray-200 px-2 py-1 rounded-md cursor-pointer">Logout</button>
         </Link>
       </div>
       <Uploader/>
