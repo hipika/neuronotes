@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Upload from './pages/upload';
+import ProtectedRoutes from './components/ProtectedRoutes';
 function App() {
   return (
     <>
@@ -11,7 +12,9 @@ function App() {
         <Route path="/" element={<Home />}/>
         <Route path="/login" element={<Login />}/>
         <Route path="/join" element={<Register />}/>
-        <Route path="/upload" element={<Upload />}/>
+        <Route element={<ProtectedRoutes/>}>
+          <Route path="/upload" element={<Upload />}/>
+        </Route>
 
       </Routes>
     </>
