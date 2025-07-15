@@ -5,7 +5,6 @@ import Navbar from '../components/Navbar';
 import Animation from '../components/Animation';
 const Register = () => {
   const [joinData, setJoinData] = useState({ username: "", email: "", password: "" })
-  const [authed, setAuthed] = useState();
   const navigate = useNavigate();
   // handling change ...-> apply this function to all values
   const handleChange = (e) => {
@@ -22,11 +21,14 @@ const Register = () => {
         headers: { "Content-Type": "application/json"},
         body: JSON.stringify(joinData) // turns updated joinData into json format
       })
-      setAuthed(true);
-      navigate("/upload");
-      const data = await response.json()
-      console.log(data);
-    
+      
+      const result = response.json();
+
+      if(result.success === true) {
+        const token = result.token;
+        localStorage.setItem("jwt", token);
+        navigate("/upload")
+      }
     } catch (e) {
       console.log(e);
     }

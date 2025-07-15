@@ -6,12 +6,12 @@ import axios from "axios"
 import { useNavigate } from 'react-router'
 const Login = () => {
 
-  const [joinData, setJoinData] = useState({ username: "", password: "" })
+  const [loginData, setLoginData] = useState({ username: "", password: "" })
   const [authed, setAuthed] = useState();
   const navigate = useNavigate();
     // handling change ...-> apply this function to all values
     const handleChange = (e) => {
-      setJoinData({ ...joinData, [e.target.name]: e.target.value})
+      setLoginData({ ...loginData, [e.target.name]: e.target.value})
     }
   
     // handling submit
@@ -23,16 +23,16 @@ const Login = () => {
         const response = await fetch("http://localhost:5000/api/users/login", {
           method: "POST",
           headers: { "Content-Type": "application/json"},
-          body: JSON.stringify(joinData) // turns updated joinData into json format  
-        })
+          body: JSON.stringify(loginData) // turns updated joinData into json format  
+         });
 
-        setAuthed(true);
-        navigate("/upload")
+         const result = await response.json();
+         if (result.success === true) {
+            const token = result.token;
+            localStorage.setItem("jwt", token)
+            navigate("/upload")
+         }
 
-        const data = await response.json()
-        console.log(data);
-
-      
       } catch (e) {
         console.log(e)
       }
@@ -56,8 +56,8 @@ const Login = () => {
           </div>
 
           <form className="mt-10 space-y-6" onSubmit={handleSubmit}>
-            <Form placeholder="Username" name="username" onChange={handleChange} type="text" autocomplete="username" id="username" value={joinData.username} />
-            <Form placeholder="Password" name="password" onChange={handleChange} type="password" autocomplete="current-password" id="password" value={joinData.password}/>
+            <Form placeholder="Username" name="username" onChange={handleChange} type="text" autocomplete="username" id="username" value={loginData.username} />
+            <Form placeholder="Password" name="password" onChange={handleChange} type="password" autocomplete="current-password" id="password" value={loginData.password}/>
 
             <div className="mt-2">
               <button
