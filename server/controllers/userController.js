@@ -57,7 +57,15 @@ const registerUser = asyncHandler(async(req, res) => {
             password: hashedPassword
         }
     });
-    res.status(200).json(createUser);
+    const accessToken = jwt.sign({
+                id: createUser.id
+        }, process.env.JWT_SECRET)
+     
+    res.send({
+        success: true,
+        token: accessToken
+    })
+    // res.status(200).json(createUser);
     console.log("User created");
 
 });
@@ -82,9 +90,7 @@ const loginUser = asyncHandler(async (req, res) => {
     // compare plain text with stored hashed password
     if (findUser && (await bcrypt.compare(password, findUser.password))) {
         const accessToken = jwt.sign({
-            user: {
                 id: findUser.id
-            }
         }, process.env.JWT_SECRET)
 
         res.send({
