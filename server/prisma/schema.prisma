@@ -18,4 +18,20 @@ model User {
   username String @unique @db.VarChar(255)
   email String @unique
   password String
+  notes Nodes[]
+}
+
+model Nodes {
+  id Int @id @default(autoincrement())
+  author User @relation(fields: [authorId], references: [id])
+  authorId String
+  x Int
+  y Int
+  label String @unique
+}
+
+model Edges {
+  id String @id @unique
+  source String @unique
+  target String @unique
 }
