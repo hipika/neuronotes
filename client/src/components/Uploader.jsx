@@ -31,7 +31,7 @@ const Uploader = () => {
   return (
     <>
     <form onSubmit={handleSubmit}
-      className="fixed left-1/2 w-150 transform -translate-x-1/2 top-[90vh] z-20 bg-black/85 border border-gray-500 px-6 py-3 rounded-2xl shadow-lg flex items-center gap-2"
+      className="fixed left-1/2 w-full max-w-2xl transform -translate-x-1/2 top-[90vh] z-20 bg-black/85 border border-gray-500 px-6 py-3 rounded-2xl shadow-lg flex flex-col items-center gap-2"
     >
       <textarea
         placeholder="Type your message..."
