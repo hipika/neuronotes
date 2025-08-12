@@ -21,14 +21,15 @@ const Register = () => {
         headers: { "Content-Type": "application/json"},
         body: JSON.stringify(joinData) // turns updated joinData into json format
       })
-      
-      const result = response.json();
-
+      // wait for result 
+      const result = await response.json();
+      // check if result is true set token -> navigate
       if(result.success === true) {
         const token = result.token;
         localStorage.setItem("jwt", token);
-        navigate("/upload")
+        navigate("/upload");
       }
+      
     } catch (e) {
       console.log(e);
     }

@@ -25,7 +25,8 @@ const Login = () => {
           headers: { "Content-Type": "application/json"},
           body: JSON.stringify(loginData) // turns updated joinData into json format  
          });
-
+        
+         // wait for result check success -> generate token -> navigate
          const result = await response.json();
          if (result.success === true) {
             const token = result.token;
