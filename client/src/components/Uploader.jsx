@@ -8,16 +8,49 @@ const Uploader = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:5000/api/users/store", {
+        method: "POST",
+        headers: {"Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jwt")}`},
+        body: JSON.stringify({
+          title: value.slice(0, 20) + '...', // auto title breaks it down,
+          messages: [value],
+          nodes: [],
+
+        })
+      });
+      const data = await response.json();
+      console.log("saved sessions", data);
+      setValue("")
+    } catch (e) {
+      console.log(e);
+    }
   }
+  
   autoResize(textAreaRef, value);
   return (
     <>
+    <form onSubmit={handleSubmit}
+      className="fixed left-1/2 w-150 transform -translate-x-1/2 top-[90vh] z-20 bg-black/85 border border-gray-500 px-6 py-3 rounded-2xl shadow-lg flex items-center gap-2"
+    >
+      <textarea
+        placeholder="Type your message..."
+        className="w-full focus:outline-none resize-none text-white bg-transparent"
+        ref={textAreaRef}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        rows={1}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleSubmit(e);
+          }
+        }}
+      />
 
-      <div className="flex justify-center items-center h-screen">
-          <div className="border w-150 px-8 py-2 rounded-2xl mt-[65vh] bg-black/85">
-            <textarea placeholder="Type." type="text" className="w-full focus:outline-none resize-none text-white" ref={textAreaRef} value={value} onChange={(e) => setValue(e.target.value)} rows={1}/>
-          </div>
-      </div>    
+
+
+    </form>
     </>
   )
   
