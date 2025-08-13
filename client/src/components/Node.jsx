@@ -1,77 +1,134 @@
-import { useState, useRef,  useCallback } from 'react';
-// import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge, Background } from '@xyflow/react';
+// import { useState, useCallback } from "react";
+import ResizableNodeSelector from './ResizableNodeSelector';
 import '@xyflow/react/dist/style.css';
+import { useState, useCallback } from 'react';
 import {
   Background,
   ReactFlow,
+  ReactFlowProvider,
   useNodesState,
   useEdgesState,
   addEdge,
   useReactFlow,
-  ReactFlowProvider,
-} from '@xyflow/react'; 
+  MiniMap,
+  SmoothStepEdge,
+} from '@xyflow/react';
+import RestoreNode from './RestoreNode';
+import SaveNode from './SaveNode';
+import RightPanel from "./RightPanel"
+import AddNode from "./AddNode";
+import Reset from './Reset';
+
+
+const flowKey = 'example-flow';
+
+const getNodeId = () => `randomnode_${+new Date()}`;
+
+const nodeTypes = {
+  ResizableNodeSelector,
+}
+
 const initialNodes = [
-  { id: 'n1', position: { x: 0, y: 0 }, data: { label: 'Hello' } },
+  { id: '1', data: { label: 'Node 1' }, type: "ResizableNodeSelector", position: { x: 0, y: -50 } },
+  { id: '2', data: { label: 'Node 2' },type: "ResizableNodeSelector",position: { x: 0, y: 50 } },
 ];
-let id = 1;
-const getId = () => `${id++}`;
-const nodeOrigin = [.5, 0]; 
+
+const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
+
 const Node = () => {
-  const reactFlowWrapper = useRef(null);
- 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const { screenToFlowPosition } = useReactFlow();
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [rfInstance, setRfInstance] = useState(null);
+  const { setViewport } = useReactFlow();
+
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
-    [],
+    [setEdges],
   );
- 
-  const onConnectEnd = useCallback(
-    (event, connectionState) => {
-      // when a connection is dropped on the pane it's not valid
-      if (!connectionState.isValid) {
-        // we need to remove the wrapper bounds, in order to get the correct position
-        const id = getId();
-        const { clientX, clientY } =
-          'changedTouches' in event ? event.changedTouches[0] : event;
-        const newNode = {
-          id,
-          position: screenToFlowPosition({
-            x: clientX,
-            y: clientY,
-          }),
-          data: { label: `Node ${id}` },
-          origin: [0.5, 0.0],
-        };
- 
-        setNodes((nds) => nds.concat(newNode));
-        setEdges((eds) =>
-          eds.concat({ id, source: connectionState.fromNode.id, target: id }),
-        );
+  const onSave = useCallback(() => {
+    if (rfInstance) {
+      const flow = rfInstance.toObject();
+      localStorage.setItem(flowKey, JSON.stringify(flow));
+    }
+  }, [rfInstance]);
+
+  const onRestore = useCallback(() => {
+    const restoreFlow = async () => {
+      const flow = JSON.parse(localStorage.getItem(flowKey));
+
+      if (flow) {
+        const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+        setNodes(flow.nodes || []);
+        setEdges(flow.edges || []);
+        setViewport({ x, y, zoom });
       }
-    },
-    [screenToFlowPosition],
-  );
+    };
+
+    restoreFlow();
+  }, [setNodes, setViewport]);
+
+  const onAdd = useCallback(() => {
+    const newNode = {
+      id: getNodeId(),
+      type: "ResizableNodeSelector",
+      data: { label: 'Added node' },
+      position: {
+        x: (Math.random() - 0.5) * 400,
+        y: (Math.random() - 0.5) * 400,
+      },
+    };
+    setNodes((nds) => nds.concat(newNode));
+  }, [setNodes]);
+  
+  // reset function -> removes all current nodes in the array
+  const resetPage = useCallback((nodeId, edgeId) => {
+    setNodes([]);
+    setEdges([]);
+  }, [setNodes, setEdges])
+
+      // editing the data of the nodes after it has been created
+  // const [nodeData, setNodeData] = useState("");
+
+  // const changeData = () => {
+  //   setNodes((nodes) => nodes.map((node) => {
+  //     if (node.id === useNodeId(node)) {
+  //       return {
+  //         ...node,
+  //         data: {
+  //           ...node.data,
+  //           label: nodeData
+  //         }
+  //       }
+  //     }
+  //   })
+  // )}
 
   return (
-    <div className="flex-1 h-full wrapper" ref={reactFlowWrapper}> 
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onConnectEnd={onConnectEnd}
-        fitView
-        fitViewOptions={{ padding: 2 }}
-        nodeOrigin={nodeOrigin}
-      >
-        <Background />
-      </ReactFlow>
-    </div>
+    <ReactFlow
+      nodes={nodes}
+      edges={edges}
+      onNodesChange={onNodesChange}
+      onEdgesChange={onEdgesChange}
+      onConnect={onConnect}
+      onInit={setRfInstance}
+      fitView
+      fitViewOptions={{ padding: 2 }}
+      nodeTypes={nodeTypes}
+    >
+      <Background />
+      <RightPanel>
+        <AddNode onClick={onAdd} />
+        <SaveNode onClick={onSave} />
+        <RestoreNode onClick={onRestore} />
+        <Reset onClick={resetPage} />
+      </RightPanel>
+
+      <MiniMap />
+
+    </ReactFlow>
   );
-}
+};
+
 export default () => (
   <ReactFlowProvider>
     <Node />
