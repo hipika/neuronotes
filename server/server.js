@@ -10,7 +10,7 @@ app.use(cors({origin: url}))
 app.use(express.json())
 app.use("/api/users", require("./routes/userRoutes"))
 app.use("/api/users", require("./routes/nodeRoutes"))
-
+app.use("/api/users", require("./routes/sessionsRoutes"))
 app.listen(port, () => {
     console.log(`Server started on port: ${port}`)
 })
